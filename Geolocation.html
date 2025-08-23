@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance to KBU Romklao Campus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            min-height: 60px;
+        }
+        .loading {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .distance {
+            font-size: 24px;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kasem Bundit University</h1>
+    <h2>Romklao Campus Distance Calculator</h2>
+    <button onclick="calculateDistance()">Where am I?</button>
+    <div id="result"></div>
+
+    <script>
+        // Coordinates of Kasem Bundit University - Romklao Campus
+        const KBU_ROMKLAO_LAT = 13.8007;
+        const KBU_ROMKLAO_LON = 100.6966;
+
+        function calculateDistance() {
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = '<p class="loading">Detecting your location...</p>';
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        
+                        // Calculate distance using Haversine formula
+                        const distance = getDistanceFromLatLonInKm(
+                            userLat, userLon, 
+                            KBU_ROMKLAO_LAT, KBU_ROMKLAO_LON
+                        );
+                        
+                        // Display result
+                        resultElement.innerHTML = `
+                            <div class="distance">You're ${distance.toFixed(2)} km away</div>
+                            <p>from Kasem Bundit University (Romklao Campus)</p>
+                        `;
+                    },
+                    function(error) {
+                        let errorMessage = "Error getting your location: ";
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += "Location access was denied.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += "Location information unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += "Location request timed out.";
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                errorMessage += "An unknown error occurred.";
+                                break;
+                        }
+                        resultElement.innerHTML = `<p class="error">${errorMessage}</p>`;
+                    }
+                );
+            } else {
+                resultElement.innerHTML = '<p class="error">Geolocation is not supported by your browser.</p>';
+            }
+        }
+
+        // Haversine formula to calculate distance between two coordinates in km
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2-lat1);
+            const dLon = deg2rad(lon2-lon1); 
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            return R * c;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+    </script>
+</body>
+</html>

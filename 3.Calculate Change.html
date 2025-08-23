@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Baht Change Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .button-group {
+            margin-top: 15px;
+        }
+        #backButton {
+            background-color: #95a5a6;
+        }
+        #backButton:hover {
+            background-color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thai Baht Change Calculator</h1>
+        <p>Enter amount to calculate change breakdown (1-100,000 THB):</p>
+        <input type="number" id="amountInput" placeholder="Enter amount in THB" min="1" max="100000">
+        <div class="button-group">
+            <button onclick="calculateChange()">Calculate</button>
+            <button id="backButton" onclick="clearForm()">Back</button>
+        </div>
+        <div id="result" class="result-container"></div>
+    </div>
+
+    <script>
+        function calculateChange() {
+            const amountInput = document.getElementById('amountInput');
+            const amount = parseInt(amountInput.value);
+            const resultElement = document.getElementById('result');
+            
+            // Clear previous results
+            resultElement.innerHTML = '';
+            
+            // Validation
+            if (isNaN(amount) || amount < 1) {
+                resultElement.innerHTML = '<p class="error">Please enter a valid positive number</p>';
+                amountInput.focus();
+                return;
+            }
+            
+            if (amount > 100000) {
+                resultElement.innerHTML = '<p class="error">Amount must be 100,000 THB or less</p>';
+                amountInput.focus();
+                return;
+            }
+            
+            let remaining = amount;
+            const denominations = [1000, 500, 100, 50, 20, 10, 5, 2, 1];
+            const results = {};
+            
+            // Calculate each denomination count
+            for (const denom of denominations) {
+                results[denom] = Math.floor(remaining / denom);
+                remaining = remaining % denom;
+            }
+            
+            // Display results
+            resultElement.innerHTML = '<h3>Change Breakdown:</h3>';
+            let total = 0;
+            
+            for (const denom of denominations) {
+                if (results[denom] > 0) {
+                    const p = document.createElement('p');
+                    p.textContent = `${results[denom]} × B${denom} = B${results[denom] * denom}`;
+                    resultElement.appendChild(p);
+                    total += results[denom] * denom;
+                }
+            }
+            
+            // Add total verification
+            const totalP = document.createElement('p');
+            totalP.style.fontWeight = 'bold';
+            totalP.style.marginTop = '10px';
+            totalP.textContent = `Total: B${total}`;
+            resultElement.appendChild(totalP);
+        }
+        
+        function clearForm() {
+            document.getElementById('amountInput').value = '';
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('amountInput').focus();
+        }
+        
+        // Add event listener for Enter key
+        document.getElementById('amountInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateChange();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enhanced Unit Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    h3 {
+      color: #3498db;
+      margin-top: 0;
+    }
+    input {
+      padding: 8px;
+      margin-right: 10px;
+      width: 200px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 15px;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .convert-btn {
+      background-color: #3498db;
+    }
+    .convert-btn:hover {
+      background-color: #2980b9;
+    }
+    .clear-btn {
+      background-color: #e74c3c;
+    }
+    .clear-btn:hover {
+      background-color: #c0392b;
+    }
+    #backBtn {
+      background-color: #7f8c8d;
+      margin-top: 20px;
+      display: block;
+      width: 100px;
+    }
+    #backBtn:hover {
+      background-color: #95a5a6;
+    }
+    .converter-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ecf0f1;
+      border-radius: 5px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .button-group {
+      margin-top: 10px;
+    }
+    .result {
+      margin-top: 10px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: #27ae60;
+    }
+  </style>
+</head>
+<body>
+ 
+<h2>Unit Converter</h2>
+
+<!-- Length Conversion -->
+<div class="converter-section">
+  <h3>Length Converter (Meters to Kilometers)</h3>
+  <input type="number" id="lengthInput" placeholder="Enter meters" step="any">
+  <div class="button-group">
+    <button class="convert-btn" onclick="convertLength()">Convert</button>
+    <button class="clear-btn" onclick="clearSection('length')">Clear</button>
+  </div>
+  <p id="lengthResult" class="result"></p>
+</div>
+ 
+<!-- Height Conversion -->
+<div class="converter-section">
+  <h3>Height Converter (Feet to Inches)</h3>
+  <input type="number" id="heightInput" placeholder="Enter feet" step="any">
+  <div class="button-group">
+    <button class="convert-btn" onclick="convertHeight()">Convert</button>
+    <button class="clear-btn" onclick="clearSection('height')">Clear</button>
+  </div>
+  <p id="heightResult" class="result"></p>
+</div>
+ 
+<!-- Temperature Conversion -->
+<div class="converter-section">
+  <h3>Temperature Converter (Celsius to Fahrenheit)</h3>
+  <input type="number" id="tempInput" placeholder="Enter °C" step="any">
+  <div class="button-group">
+    <button class="convert-btn" onclick="convertTemperature()">Convert</button>
+    <button class="clear-btn" onclick="clearSection('temp')">Clear</button>
+  </div>
+  <p id="tempResult" class="result"></p>
+</div>
+ 
+<!-- Area Conversion -->
+<div class="converter-section">
+  <h3>Area Converter (Square Meters to Square Feet)</h3>
+  <input type="number" id="areaInput" placeholder="Enter m²" step="any">
+  <div class="button-group">
+    <button class="convert-btn" onclick="convertArea()">Convert</button>
+    <button class="clear-btn" onclick="clearSection('area')">Clear</button>
+  </div>
+  <p id="areaResult" class="result"></p>
+</div>
+
+<!-- Back Button -->
+<button id="backBtn" onclick="goBack()">⬅ Back</button>
+
+<script>
+// Enhanced back button functionality
+function goBack() {
+  try {
+    // First try using the history API
+    if (window.history && window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    
+    // Fallback: Try to get the referrer
+    if (document.referrer) {
+      window.location.href = document.referrer;
+      return;
+    }
+    
+    // Ultimate fallback: Go to a default page
+    window.location.href = "index.html"; // Change to your home page
+  } catch (e) {
+    console.error("Error in goBack:", e);
+    window.location.href = "index.html"; // Final fallback
+  }
+}
+
+// Clear specific section
+function clearSection(section) {
+  document.getElementById(section + 'Input').value = '';
+  document.getElementById(section + 'Result').textContent = '';
+  document.getElementById(section + 'Result').className = 'result';
+}
+
+// Enhanced input validation
+function validateInput(value, resultId, unitName, allowNegative = false) {
+  const resultElement = document.getElementById(resultId);
+  
+  if (value === "" || isNaN(value)) {
+    resultElement.textContent = "Please enter a valid number for " + unitName + ".";
+    resultElement.className = 'result error';
+    return false;
+  }
+  
+  if (!allowNegative && value < 0) {
+    resultElement.textContent = unitName + " cannot be negative.";
+    resultElement.className = 'result error';
+    return false;
+  }
+  
+  return true;
+}
+
+// Conversion functions with improved validation
+function convertLength() {
+  const meters = document.getElementById("lengthInput").value;
+  const resultElement = document.getElementById("lengthResult");
+  
+  if (!validateInput(meters, "lengthResult", "length")) return;
+  
+  const km = meters / 1000;
+  resultElement.textContent = meters + " meters = " + km.toFixed(4) + " kilometers";
+  resultElement.className = 'result success';
+}
+
+function convertHeight() {
+  const feet = document.getElementById("heightInput").value;
+  const resultElement = document.getElementById("heightResult");
+  
+  if (!validateInput(feet, "heightResult", "height")) return;
+  
+  const inches = feet * 12;
+  resultElement.textContent = feet + " feet = " + inches.toFixed(2) + " inches";
+  resultElement.className = 'result success';
+}
+
+function convertTemperature() {
+  const celsius = document.getElementById("tempInput").value;
+  const resultElement = document.getElementById("tempResult");
+  
+  // Temperature can be negative, so we set allowNegative to true
+  if (!validateInput(celsius, "tempResult", "temperature", true)) return;
+  
+  const fahrenheit = (celsius * 9/5) + 32;
+  resultElement.textContent = celsius + "°C = " + fahrenheit.toFixed(2) + "°F";
+  resultElement.className = 'result success';
+}
+
+function convertArea() {
+  const sqm = document.getElementById("areaInput").value;
+  const resultElement = document.getElementById("areaResult");
+  
+  if (!validateInput(sqm, "areaResult", "area")) return;
+  
+  const sqft = sqm * 10.7639;
+  resultElement.textContent = sqm + " m² = " + sqft.toFixed(2) + " ft²";
+  resultElement.className = 'result success';
+}
+</script>
+ 
+</body>
+</html>
